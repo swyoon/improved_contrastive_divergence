@@ -1,11 +1,11 @@
-import tensorflow as tf
 import numpy as np
 import timeit
-from tensorflow.python.platform import flags
 import torch.nn.functional as F
 from torch.nn.utils import clip_grad_norm
 import time
 from multiprocessing import Process
+import tensorflow as tf
+from tensorflow.python.platform import flags
 
 from data import Cifar10, CelebAHQ, Mnist, ImageNet, LSUNBed, STLDataset
 from models import ResNetModel, CelebAModel, MNISTModel, ImagenetModel
@@ -21,7 +21,8 @@ from io import StringIO
 from tensorflow.core.util import event_pb2
 import torch
 import numpy as np
-from scipy.misc import imsave
+# from scipy.misc import imsave
+# from imageio import imwrite 
 import matplotlib.pyplot as plt
 from easydict import EasyDict
 
@@ -405,6 +406,7 @@ def train(models, models_ema, optimizer, logger, dataloader, resume_iter, logdir
                 else:
                     im_neg, im_neg_kl, x_grad = gen_image(label, FLAGS, model, data_corrupt, num_steps)
 
+            from pudb import set_trace; set_trace()
             energy_pos = model.forward(data, label[:data.size(0)])
             energy_neg = model.forward(im_neg.clone(), label)
 

@@ -503,3 +503,49 @@ def accuracy(output, target, topk=(1,)):
             correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
             res.append(correct_k.mul_(100.0 / batch_size))
         return res
+
+    
+    
+from sklearn.metrics import roc_auc_score
+def roc_btw_arr(arr1, arr2):
+    true_label = np.concatenate([np.ones_like(arr1),
+                                 np.zeros_like(arr2)])
+    score = np.concatenate([arr1, arr2])
+    return roc_auc_score(true_label, score)
+
+
+def batch_run(m, dl, device, flatten=False, method='predict', input_type='first', no_grad=True, **kwargs):
+    """
+    m: model
+    dl: dataloader
+    device: device
+    method: the name of a function to be called
+    no_grad: use torch.no_grad if True.
+    kwargs: additional argument for the method being called
+    """
+    method = getattr(m, method)
+    l_result = []
+    for batch in dl:
+        if input_type == 'first':
+            x = batch[0]
+
+        if no_grad:
+            with torch.no_grad():
+                if flatten:
+                    x = x.view(len(x), -1)
+                pred = method(x.to(device), **kwargs).detach().cpu()
+        else:
+            if flatten:
+                x = x.view(len(x), -1)
+            pred = method(x.to(device), **kwargs).detach().cpu()
+
+        l_result.append(pred)
+    return torch.cat(l_result)
+
+
+
+def get_shuffled_idx(N, seed):
+    """get randomly permuted indices"""
+    rng = np.random.default_rng(seed)
+    return rng.permutation(N)
+

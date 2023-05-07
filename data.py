@@ -12,8 +12,10 @@ import os.path as osp
 import os
 import numpy as np
 import time
-from scipy.misc import imread, imresize
-from skimage.color import rgb2grey
+# from scipy.misc import imread, imresize
+from imageio import imread
+from skimage.transform import resize
+from skimage.color import rgb2gray
 from torchvision.datasets import CIFAR10, MNIST, SVHN, CIFAR100, ImageFolder, LSUNClass
 from torchvision import transforms
 import torch
@@ -83,7 +85,7 @@ class CelebAHQ(Dataset):
         im = np.load(path)
         im = im[0].transpose((1, 2, 0))
         image_size = 128
-        im = imresize(im, (image_size, image_size))
+        im = resize(im, (image_size, image_size))
         im = im / 256
         im = im + np.random.uniform(0, 1 / 256., im.shape)
 
@@ -123,7 +125,7 @@ class ImageNet(Dataset):
         else:
             im = im[:, :, :3]
         image_size = 128
-        im = imresize(im, (image_size, image_size))
+        im = resize(im, (image_size, image_size))
         im = im / 256
         im = im + np.random.uniform(0, 1 / 256., im.shape)
         im_corrupt = np.random.uniform(0, 1, size=(image_size, image_size, 3))
@@ -156,7 +158,7 @@ class LSUNBed(Dataset):
         im = np.array(Image.open(buf).convert('RGB'))
 
         image_size = 128
-        im = imresize(im, (image_size, image_size))
+        im = resize(im, (image_size, image_size))
         im = im / 256
         im = im + np.random.uniform(0, 1 / 256., im.shape)
         im_corrupt = np.random.uniform(0, 1, size=(image_size, image_size, 3))
@@ -193,7 +195,7 @@ class CelebA(Dataset):
             fname = info.name
         path = osp.join(self.path, fname)
         im = imread(path)
-        im = imresize(im, (128, 128))
+        im = resize(im, (128, 128))
         image_size = 128
         im = im / 255.
 
@@ -236,7 +238,7 @@ class CelebaSmall(Dataset):
             fname = info.name
         path = osp.join(self.path, fname)
         im = imread(path)
-        im = imresize(im, (32, 32))
+        im = resize(im, (32, 32))
         image_size = 32
         # print(im.max())
         # print(im.min())
@@ -553,7 +555,7 @@ class ImageNetFull(Dataset):
         label = self.labels[index]
         path = self.xs[index]
 
-        im = imresize(imread(path), (128, 128))
+        im = resize(imread(path), (128, 128))
         im = im / 255
         if len(im.shape) == 2:
             im = np.tile(im[:, :, None], (1, 1, 3))
@@ -608,7 +610,7 @@ class CelebAHQOverfit(Dataset):
         im = np.load(path)
         im = im[0].transpose((1, 2, 0))
         image_size = 128
-        im = imresize(im, (image_size, image_size))
+        im = resize(im, (image_size, image_size))
         im = im / 256
         im = im + np.random.uniform(0, 1 / 256., im.shape)
         im = im.transpose((2, 0, 1))
